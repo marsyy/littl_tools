@@ -21,6 +21,9 @@ def syms2idc(in_file,out_file):
 			data_list = line.split()
 			tmp = "\tMakeNameEx(0x%s,\"%s\",0);\n"%(data_list[0],data_list[2])
 			idc_body+=tmp
+			if 't' in data_list[1] or 'T' in data_list[1]:
+				tmp = "\tMakeFunction(0x%s,BADADDR);\n"%(data_list[0])
+			idc_body+=tmp
 		f_out.write(idc_header+idc_body+idc_foot)
 	except IOError,e:
 		print e
