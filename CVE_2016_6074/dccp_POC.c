@@ -1,3 +1,8 @@
+
+/*
+	reboot if we get bind error
+*/
+
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
@@ -24,7 +29,9 @@
 #endif
 
 #define IPV6_RECVPKTINFO 49
-#define DCCP_PORT 8889
+
+#define DCCP_PORT 9999
+
 
 int child_main(){
 	int fd;
@@ -60,7 +67,8 @@ int child_main(){
 	ret = connect(fd,(struct sockaddr *)&target_addr,sizeof(target_addr));
 	if(ret == -1){
 		perror("child  connect ");
-	}else{
+	}
+	else{
 		do{
 			status = send(fd,buf,30,0);
 		}while((status < 0) && (errno == EAGAIN));
@@ -75,14 +83,20 @@ int father_main(){
 	int fd;
 	int ret;
 
+	int on = 1;
+	int optval = 1;
+	int recv_buf[100];
+	int client_fd;
+
 	int pid = fork();
 
 	if(pid == 0){
-		sleep(1);
+
+		usleep(100);
 		child_main();
 		exit(0);
-	}else{
-
+	}
+	else{
 
 		if((fd = socket(AF_INET6,SOCK_DCCP,IPPROTO_DCCP)) == -1){
 			perror("socket");
@@ -96,12 +110,12 @@ int father_main(){
 		addr.sin6_port = htons(DCCP_PORT);
 		addr.sin6_addr = in6addr_any;
 
-		int on = 1;
+
 		ret = setsockopt(fd, SOL_DCCP, SO_REUSEADDR, (const char *) &on, sizeof(on));
 		if(ret == -1){
 			perror("setsockopt 1");
 		}
-		int optval = 1;
+
 		ret = setsockopt(fd,SOL_IPV6,IPV6_RECVPKTINFO,&optval,sizeof(optval));
 		if(ret == -1){
 			perror("setsockopt 2");
@@ -116,14 +130,13 @@ int father_main(){
 		if(ret == -1){
 			perror("listen");
 		}
-		int buf[20];
-		int recv_buf[100];
-		int client_fd = accept(fd,(struct sockaddr *)&remout_addr,0);//fack addr
+
+
+		client_fd = accept(fd,(struct sockaddr *)&remout_addr,0);//fack addr
 
 		close(fd);
-		waitpid(pid,NULL,0);
 	}
-
+	waitpid(pid,NULL,0);
 	return 0;
 }
 
