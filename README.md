@@ -12,3 +12,7 @@
 ## pixel_c_image
 - get Image from Image.fit for pixel C
 - usage: ./get_image.py \<Image_fit\_file\> \<out\_file\_name>
+
+
+##bluetooth
+- bluetooth vulnerability study
