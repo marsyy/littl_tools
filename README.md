@@ -14,5 +14,5 @@
 - usage: ./get_image.py \<Image_fit\_file\> \<out\_file\_name>
 
 
-##bluetooth
+## bluetooth
 - bluetooth vulnerability study
